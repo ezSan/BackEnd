@@ -1,0 +1,27 @@
+[
+  {
+    "nombre": "Milanesa napolitana",
+    "precio": 1700,
+    "id": 1
+  },
+  {
+    "nombre": "Pollo al verdeo",
+    "precio": 1900,
+    "id": 2
+  },
+  {
+    "nombre": "Salmón rosado",
+    "precio": 2100,
+    "id": 3
+  },
+  {
+    "nombre": "Pizza calabresa",
+    "precio": 1450,
+    "id": 4
+  },
+  {
+    "nombre": "Matambrito de cerdo al limon",
+    "precio": 1900,
+    "id": 5
+  }
+]
