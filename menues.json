@@ -15,13 +15,8 @@
     "id": 3
   },
   {
-    "nombre": "Pizza calabresa",
-    "precio": 1450,
-    "id": 4
-  },
-  {
-    "nombre": "Matambrito de cerdo al limon",
-    "precio": 1900,
-    "id": 5
+    "nombre": "Ensalada César",
+    "precio": 1400,
+    "id": 6
   }
 ]
