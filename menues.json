@@ -18,5 +18,10 @@
     "nombre": "Ensalada César",
     "precio": 1400,
     "id": 6
+  },
+  {
+    "nombre": "Ñoquis con champigñones y vino tinto",
+    "precio": 1800,
+    "id": 5
   }
 ]

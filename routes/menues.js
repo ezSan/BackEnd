@@ -69,7 +69,7 @@ router.patch("/:id", (req, res) => {
             console.log("Ha ocurrido un error al escribir el archivo");
           }
 
-          return res.status(200).send("Menú modificado");
+          return res.status(200).send("Menú modificado correctamente");
         });
       }
     });
