@@ -1,79 +1,85 @@
 const express = require("express");
 const router = express.Router();
+const sequelize = require("../db/connection");
 
-const fs = require("fs");
+/* const Producto = require("../models/producto"); */
 
 router.get("/", (req, res) => {
-  fs.readFile("menues.json", (error, file) => {
-    if (error) {
-      console.log("No se puede leer el archivo", error);
-      return;
-    }
-
-    const menues = JSON.parse(file);
-    return res.json(menues);
-  });
+  try {
+    sequelize.models.Producto.findAll({ where: { status: "ACTIVE" } })
+      .then((product) => {
+        res.status(200).json(product);
+      })
+      .catch((error) => {
+        res.status(400).json(error);
+      });
+  } catch (error) {
+    res.status(400).json(error);
+    console.error("Unable to connect to the database:", error);
+  }
 });
 
 router.post("/", (req, res) => {
-  fs.readFile("menues.json", (err, data) => {
-    if (err) {
-      console.log("No se puede leer el archivo", err);
-    }
-
-    const menues = JSON.parse(data);
-
-    const newMenuID = menues.length + 1;
-
-    req.body.id = newMenuID;
-
-    menues.push(req.body);
-
-    /* Ya se agregó el menu al array */
-    const newMenu = JSON.stringify(menues, null, 2);
-
-    fs.writeFile("menues.json", newMenu, (err) => {
-      if (err) {
-        console.log("Ha ocurrido un error al escribir el archivo");
-      }
-
-      return res.status(200).send("Nuevo menu agregado");
+  try {
+    let menuToSave = req.body;
+    let menu = sequelize.models.Producto.build({
+      nombre: menuToSave.nombre,
+      precio: menuToSave.precio,
     });
-  });
+    menu
+      .save()
+      .then((savedMenu) => {
+        res.status(200).json(savedMenu);
+      })
+      .catch((error) => {
+        res.status(400).json(error);
+        console.error("Unable to connect to the database:", error);
+      });
+  } catch (error) {
+    res.status(400).json(error);
+    console.error("Unable to connect to the database:", error);
+  }
 });
 
 router.patch("/:id", (req, res) => {
-  const mid = req.params.id; /* extraemos el id enviado a la ruta */
-  const { nombre, precio } = req.body; /* extraer los demás campos */
+  try {
+    let productToPatch = req.params.id;
+    let { nombre, precio, status } = req.body;
 
-  fs.readFile("menues.json", (err, data) => {
-    if (err) {
-      console.log("No sea ha podido leer el archivo", err);
-    }
+    
+  } catch (error) {}
 
-    const menues = JSON.parse(data); /* rescato el menu, de menues */
+  // const mid = req.params.id; /* extraemos el id enviado a la ruta */
+  // const { nombre, precio } = req.body; /* extraer los demás campos */
 
-    menues.forEach((menu) => {
-      if (menu.id === Number(mid)) {
-        if (nombre != undefined) {
-          menu.nombre = nombre;
-        }
-        if (precio != undefined) {
-          menu.precio = precio;
-        }
+  // fs.readFile("menues.json", (err, data) => {
+  //   if (err) {
+  //     console.log("No sea ha podido leer el archivo", err);
+  //   }
 
-        const menueUpdated = JSON.stringify(menues, null, 2);
+  //   const menues = JSON.parse(data); /* rescato el menu, de menues */
 
-        fs.writeFile("menues.json", menueUpdated, (err) => {
-          if (err) {
-            console.log("Ha ocurrido un error al escribir el archivo");
-          }
+  //   menues.forEach((menu) => {
+  //     if (menu.id === Number(mid)) {
+  //       if (nombre != undefined) {
+  //         menu.nombre = nombre;
+  //       }
+  //       if (precio != undefined) {
+  //         menu.precio = precio;
+  //       }
 
-          return res.status(200).send("Menú modificado correctamente");
-        });
-      }
-    });
-  });
+  //       const menueUpdated = JSON.stringify(menues, null, 2);
+
+  //       fs.writeFile("menues.json", menueUpdated, (err) => {
+  //         if (err) {
+  //           console.log("Ha ocurrido un error al escribir el archivo");
+  //         }
+
+  //         return res.status(200).send("Menú modificado correctamente");
+  //       });
+  //     }
+  //   });
+  // });
 });
 
 router.delete("/:id", (req, res) => {
