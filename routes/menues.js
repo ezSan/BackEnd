@@ -6,7 +6,7 @@ const sequelize = require("../db/connection");
 
 router.get("/", (req, res) => {
   try {
-    sequelize.models.Producto.findAll({ where: { status: "ACTIVE" } })
+    sequelize.models.Product.findAll({ where: { status: "ACTIVE" } })
       .then((product) => {
         res.status(200).json(product);
       })
@@ -22,7 +22,7 @@ router.get("/", (req, res) => {
 router.post("/", (req, res) => {
   try {
     let menuToSave = req.body;
-    let menu = sequelize.models.Producto.build({
+    let menu = sequelize.models.Product.build({
       nombre: menuToSave.nombre,
       precio: menuToSave.precio,
     });
@@ -43,71 +43,57 @@ router.post("/", (req, res) => {
 
 router.patch("/:id", (req, res) => {
   try {
-    let productToPatch = req.params.id;
-    let { nombre, precio, status } = req.body;
+    let productId = req.params.id;
+    let productToUpdate = req.body;
 
-    
-  } catch (error) {}
+    sequelize.models.Product.findByPk(productId)
+      .then((product) => {
+        product.nombre = productToUpdate.nombre;
+        product.precio = productToUpdate.precio;
 
-  // const mid = req.params.id; /* extraemos el id enviado a la ruta */
-  // const { nombre, precio } = req.body; /* extraer los demás campos */
-
-  // fs.readFile("menues.json", (err, data) => {
-  //   if (err) {
-  //     console.log("No sea ha podido leer el archivo", err);
-  //   }
-
-  //   const menues = JSON.parse(data); /* rescato el menu, de menues */
-
-  //   menues.forEach((menu) => {
-  //     if (menu.id === Number(mid)) {
-  //       if (nombre != undefined) {
-  //         menu.nombre = nombre;
-  //       }
-  //       if (precio != undefined) {
-  //         menu.precio = precio;
-  //       }
-
-  //       const menueUpdated = JSON.stringify(menues, null, 2);
-
-  //       fs.writeFile("menues.json", menueUpdated, (err) => {
-  //         if (err) {
-  //           console.log("Ha ocurrido un error al escribir el archivo");
-  //         }
-
-  //         return res.status(200).send("Menú modificado correctamente");
-  //       });
-  //     }
-  //   });
-  // });
+        // actualiza product
+        product
+          .save()
+          .then((updatedProduct) => {
+            res.status(200).json(updatedProduct);
+          })
+          .catch((error) => {
+            res.status(400).json(error);
+            console.error("Unable to connect to the database:", error);
+          });
+      })
+      .catch((error) => {
+        res.status(400).json(error);
+        console.error("Unable to connect to the database:", error);
+      });
+  } catch (error) {
+    res.status(400).json(error);
+    console.error("Unable to connect to the database:", error);
+  }
 });
 
 router.delete("/:id", (req, res) => {
-  const mid = req.params.id;
-
-  fs.readFile("menues.json", (err, data) => {
-    if (err) {
-      console.log("Ha ocurrido un error al leer el fichero", err);
-    }
-
-    const menues = JSON.parse(data);
-
-    menues.forEach((menu) => {
-      if (menu.id === Number(mid)) {
-        menues.splice(menues.indexOf(menu), 1);
-
-        const menuDeleted = JSON.stringify(menues, null, 2);
-
-        fs.writeFile("menues.json", menuDeleted, (err) => {
-          if (err) {
-            console.log("Ha ocurrido un error al escribir el archivo", err);
-          }
-
-          return res.status(200).send("Menú eliminado correctamente");
-        });
-      }
-    });
-  });
+  try {
+    let productId = req.params.id;
+    sequelize.models.Product.findByPk(productId)
+      .then((product) => {
+        // delete la orden
+        product.status = "INACTIVE";
+        product
+          .save()
+          .then((productDeleted) => {
+            res.status(200).json(productDeleted);
+          })
+          .catch((error) => {
+            res.status(400).json(error);
+            console.error("Unable to connect to the database:", error);
+          });
+      })
+      .catch((error) => {
+        res.status(400).json(error);
+        console.error("Unable to connect to the database:", error);
+      });
+  } catch (error) {}
 });
 
 module.exports = router;
