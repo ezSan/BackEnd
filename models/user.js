@@ -45,8 +45,7 @@ User.init(
   }
 );
 
-
-/*  User.sync()
+/*   User.sync()
   .then((result) => {
     User.findOrCreate({
       where: {
@@ -55,13 +54,14 @@ User.init(
         email: "admin@admin.com",
         phone: "123456",
         address: "Delillah resto",
-        password: "admin"
+        password: "admin",
+        rolId:1
       }
     });
   })
   .catch((error) => {
     console.error("Error", error);
-  }); */
-
+  });
+ */
 
 module.exports = User;
