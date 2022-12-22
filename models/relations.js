@@ -1,5 +1,4 @@
 const Product = require("./product");
-const Item = require("./item");
 const Order = require("./order");
 const Rol = require("./rol");
 const User = require("./user");
