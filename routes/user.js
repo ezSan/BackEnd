@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const sequelize = require("../db/connection");
+const jwt = require('jsonwebtoken')
 
 router.get("/", (req, res) => {
   try {
@@ -101,5 +102,45 @@ router.delete("/:id", (req, res) => {
       });
   } catch (error) {}
 });
+
+
+router.post("/login", (req, res) => {
+  try {
+    let userToAuthenticate = req.body;
+    sequelize.models.User.findOne({ where: { username: userToAuthenticate.username } }).then((user) => {
+      // Verificar contra
+      if (user.password == userToAuthenticate.password ){
+        // Generar token de autenticacion
+        let authentication = {
+          username: user.username,
+          id: user.id,          
+          
+        };
+        const token = jwt.sign(authentication, 'secret', {
+            expiresIn: '2h'
+        });
+        res.status(200).header('Authorization', token).json({
+          data: `Welcome ${user.fullname}`,
+          token
+        });
+      } else {
+        res.status(401).json({ error: 'Verify credetials'});
+      }
+    }).catch((error)=>{
+      console.log(error);
+      res.status(401).json({ error: 'Verify credetials'});
+    });
+    
+  } catch (error) {
+    res.status(400).json(error);
+    console.error('Unable to connect to the database:', error);
+  }
+}
+)
+ 
+
+    
+  
+;
 
 module.exports = router;
