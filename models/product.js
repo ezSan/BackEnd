@@ -14,8 +14,7 @@ Product.init(
     },
     nombre: {
       type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
+      allowNull: false      
     },
     precio: {
       type: DataTypes.STRING,

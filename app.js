@@ -6,15 +6,6 @@ const db = require("./db/connection");
 
 const relations = require('./models/relations');
 
-/* const Producto = require('./models/producto');
-const Item = require('./models/item');
-const Pedido = require('./models/pedido');
-const Rol = require('./models/rol');
-const User = require('./models/user');
-const MetodoPago = require('./models/metodoPago'); */
-
-
-
 
 // middle
 var bodyParser = require("body-parser");

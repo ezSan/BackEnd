@@ -6,15 +6,14 @@ class Order extends Model {}
 Order.init(
   {
     // Model attributes are defined here
-    orderId: {
+    id: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
     total: {
       type: DataTypes.DECIMAL,
-      allowNull: false,
-      unique: true,
+      allowNull: false      
     }
   },
   {
