@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const sequelize = require("../db/connection");
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
+
+const ValidateUserData = require("../middlewares/userControler");
 
 router.get("/", (req, res) => {
   try {
@@ -18,7 +20,29 @@ router.get("/", (req, res) => {
   }
 });
 
-router.post("/", (req, res) => {
+
+router.get("/:id", (req, res) => {
+
+  let userId = req.params.id;
+
+  try {
+    sequelize.models.User.findByPk(userId)
+      .then((user) => {
+        res.status(200).json(user);
+      })
+      .catch((error) => {
+        res.status(400).json(error);
+      });
+  } catch (error) {
+    res.status(400).json(error);
+    console.error("Unable to connect to the database:", error);
+  }
+});
+
+
+
+
+router.post("/",ValidateUserData, (req, res) => {
   try {
     userToSave = req.body;
     user = sequelize.models.User.build({
@@ -86,15 +110,15 @@ router.delete("/:id", (req, res) => {
 
     sequelize.models.User.findByPk(userToDeleteId)
       .then((userToDelete) => {
-        userToDelete.destroy()
-        .then((deleted)=>{
-          res.status(200).json(deleted);
-        })
-        .catch((error)=>{
-          res.status(400).json(error);
-          console.error("Unable to connect to the database:", error);
-        })
-        
+        userToDelete
+          .destroy()
+          .then((deleted) => {
+            res.status(200).json(deleted);
+          })
+          .catch((error) => {
+            res.status(400).json(error);
+            console.error("Unable to connect to the database:", error);
+          });
       })
       .catch((error) => {
         res.status(400).json(error);
@@ -103,44 +127,45 @@ router.delete("/:id", (req, res) => {
   } catch (error) {}
 });
 
+router.post("/login",  (req, res) => {
 
-router.post("/login", (req, res) => {
   try {
+    console.log("Has iniciado sesión");
     let userToAuthenticate = req.body;
-    sequelize.models.User.findOne({ where: { username: userToAuthenticate.username } }).then((user) => {
-      // Verificar contra
-      if (user.password == userToAuthenticate.password ){
-        // Generar token de autenticacion
-        let authentication = {
-          username: user.username,
-          id: user.id,          
-          
-        };
-        const token = jwt.sign(authentication, 'secret', {
-            expiresIn: '2h'
-        });
-        res.status(200).header('Authorization', token).json({
-          data: `Welcome ${user.fullname}`,
-          token
-        });
-      } else {
-        res.status(401).json({ error: 'Verify credetials'});
-      }
-    }).catch((error)=>{
-      console.log(error);
-      res.status(401).json({ error: 'Verify credetials'});
-    });
-    
+
+    sequelize.models.User.findOne({
+      where: { username: userToAuthenticate.username },
+    })
+      .then((user) => {
+        // Verificar contra
+        if (user.password == userToAuthenticate.password) {
+          // Generar token de autenticacion
+          let authentication = {
+            username: user.username,
+            id: user.id,
+          };
+          const token = jwt.sign(authentication, "secret", {
+            expiresIn: "2h",
+          });
+          res
+            .status(200)
+            .header("Authorization", token)
+            .json({
+              data: `Welcome ${user.fullname}`,
+              token,
+            });
+        } else {
+          res.status(401).json({ error: "Verify credetials" });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(401).json({ error: "Verify credetials" });
+      });
   } catch (error) {
     res.status(400).json(error);
-    console.error('Unable to connect to the database:', error);
+    console.error("Unable to connect to the database:", error);
   }
-}
-)
- 
-
-    
-  
-;
+});
 
 module.exports = router;

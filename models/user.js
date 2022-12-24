@@ -36,6 +36,11 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    rolId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    }
   },
   {
     // Other model options go here

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const sequelize = require("../db/connection");
+const sequelize = require("../db/connection"); 
+const ValidateProductData = require("../middlewares/productControler")
 
 /* const Producto = require("../models/producto"); */
 
@@ -19,7 +20,24 @@ router.get("/", (req, res) => {
   }
 });
 
-router.post("/", (req, res) => {
+router.get("/:id", (req, res) => {
+  let productId = req.params.id;
+
+  try {
+    sequelize.models.Product.findByPk(productId)
+      .then((product) => {
+        res.status(200).json(product);
+      })
+      .catch((error) => {
+        res.status(400).json(product);
+      });
+  } catch (error) {
+    res.status(400).json(error);
+    console.error("Unable to connect to the database:", error);
+  }
+});
+
+router.post("/", ValidateProductData, (req, res) => {
   try {
     let menuToSave = req.body;
     let menu = sequelize.models.Product.build({
