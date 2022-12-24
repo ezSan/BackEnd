@@ -4,6 +4,7 @@ const sequelize = require("../db/connection");
 const jwt = require("jsonwebtoken");
 
 const ValidateUserData = require("../middlewares/userControler");
+const ValidacionJWTadmin = require("../middlewares/jwtValidation");
 
 router.get("/", (req, res) => {
   try {
@@ -20,9 +21,7 @@ router.get("/", (req, res) => {
   }
 });
 
-
-router.get("/:id", (req, res) => {
-
+router.get("/:id", ValidacionJWTadmin, (req, res) => {
   let userId = req.params.id;
 
   try {
@@ -39,10 +38,7 @@ router.get("/:id", (req, res) => {
   }
 });
 
-
-
-
-router.post("/",ValidateUserData, (req, res) => {
+router.post("/", ValidateUserData, (req, res) => {
   try {
     userToSave = req.body;
     user = sequelize.models.User.build({
@@ -69,7 +65,7 @@ router.post("/",ValidateUserData, (req, res) => {
   }
 });
 
-router.patch("/:id", (req, res) => {
+router.patch("/:id", ValidacionJWTadmin, (req, res) => {
   try {
     let userId = req.params.id;
     let newDataUser = req.body;
@@ -104,7 +100,7 @@ router.patch("/:id", (req, res) => {
   }
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", ValidacionJWTadmin, (req, res, next) => {
   try {
     let userToDeleteId = req.params.id;
 
@@ -127,10 +123,8 @@ router.delete("/:id", (req, res) => {
   } catch (error) {}
 });
 
-router.post("/login",  (req, res) => {
-
+router.post("/login", (req, res) => {
   try {
-    console.log("Has iniciado sesión");
     let userToAuthenticate = req.body;
 
     sequelize.models.User.findOne({
@@ -142,11 +136,13 @@ router.post("/login",  (req, res) => {
           // Generar token de autenticacion
           let authentication = {
             username: user.username,
-            id: user.id,
+            rolId: user.rolId,
           };
+
           const token = jwt.sign(authentication, "secret", {
             expiresIn: "2h",
           });
+
           res
             .status(200)
             .header("Authorization", token)

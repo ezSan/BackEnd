@@ -1,7 +1,10 @@
+const { request } = require("express");
 const express = require("express");
 const router = express.Router();
-const sequelize = require("../db/connection"); 
-const ValidateProductData = require("../middlewares/productControler")
+const sequelize = require("../db/connection");
+const ValidateProductData = require("../middlewares/productControler");
+const ValidacionJWTadmin = require("../middlewares/jwtValidation");
+const jwt = require("jsonwebtoken");
 
 /* const Producto = require("../models/producto"); */
 
@@ -20,7 +23,7 @@ router.get("/", (req, res) => {
   }
 });
 
-router.get("/:id", (req, res) => {
+router.get("/:id", ValidacionJWTadmin, (req, res) => {
   let productId = req.params.id;
 
   try {
@@ -37,7 +40,7 @@ router.get("/:id", (req, res) => {
   }
 });
 
-router.post("/", ValidateProductData, (req, res) => {
+router.post("/", ValidacionJWTadmin, ValidateProductData, (req, res) => {
   try {
     let menuToSave = req.body;
     let menu = sequelize.models.Product.build({
@@ -59,7 +62,7 @@ router.post("/", ValidateProductData, (req, res) => {
   }
 });
 
-router.patch("/:id", (req, res) => {
+router.patch("/:id", ValidacionJWTadmin, (req, res) => {
   try {
     let productId = req.params.id;
     let productToUpdate = req.body;
@@ -90,7 +93,7 @@ router.patch("/:id", (req, res) => {
   }
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", ValidacionJWTadmin, (req, res) => {
   try {
     let productId = req.params.id;
     sequelize.models.Product.findByPk(productId)
