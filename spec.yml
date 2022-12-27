@@ -1,0 +1,346 @@
+openapi: 3.0.0
+servers:
+  - description: localhost server
+    url: http://localhost:3000/delilahResto
+info:
+  title: Delilah Resto
+  version: 1.0.0
+  description: 
+    "Sistema de pedidos en línea para un restaurante.
+    Esta API REST permite agregar, cancelar, modificar
+    y obtener información sobre una base de datos."
+  contact:
+    email: "ezequiel.sanchez.7391@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html" 
+tags:
+- name: admin
+  description: "Usuario administrador, sin acceso limitado."
+- name: client
+  description: "Usuarios sin permiso de administrador, con acceso limitado."
+- name: /users
+  description: "Endpoint para todas las solicitudes del CRUD de usuarios."
+- name: /products
+  description: "Endpoint para todas las solicitudes del CRUD de productos."
+- name: /orders
+  description: "Endpoint para todas las solicitudes del CRUD de ordenes."
+paths:
+/products:
+  get:
+    tags:
+      - "products"
+    summary: "Return the list of all the products"
+    produces:
+      - "application/json"
+    parameters:
+      - in: "header"
+        name: "Authorization"
+        description: "Authorization token obtained at logging"
+        required: true
+        type: "string"
+    responses:
+      "200":
+        description: "Operación satisfactoria"
+        schema:
+          type: "array"
+      "401":
+        description: "Unable to connect to the database"
+  post:
+    tags:
+      - "products"
+    summary: "Add a new product to the menu"
+    description: ""
+    consumes:
+      - "application/json"
+    produces:
+      - "application/json"
+    parameters:
+      - in: "header"
+        name: "Authorization"
+        description: "Authentication token with administrator role"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Product object to add to the list"
+        required: true
+    responses:
+      "201":
+        description: "'Producto creado correctamente'"
+      "400":
+        description: "Bad request"
+      "403":
+        description: "Unauthorized"
+    /products/{productId}:
+      patch:
+        tags:
+          - "products"
+        summary: "Modify a product"
+        description: ""
+        consumes:
+          - "application/json"
+        produces:
+          - "application/json"
+        parameters:
+          - in: "header"
+            name: "Authorization"
+            description: "Authentication token with administrator role"
+            required: true
+            type: "string"
+          - in: "path"
+            name: "productId"
+            description: "Product Id to modify"
+            required: true
+            type: "string"
+          - in: "body"
+            name: "body"
+            description: "Product modified"
+            required: true
+
+        responses:
+          "200":
+            description: "Producto actualizado correctamente"
+          "400":
+            description: "Bad request"
+          "403":
+            description: "Unauthorized"
+          "404":
+            description: "Product not found"
+  delete:
+    tags:
+      - "products"
+    summary: "Delete a product"
+    description: ""
+    operationId: "deleteProduct"
+    produces:
+      - "application/json"
+    parameters:
+      - in: "header"
+        name: "Authorization"
+        description: "Authentication token with administrator role"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "productId"
+        description: "Product Id to delete"
+        required: true
+        type: "string"
+    responses:
+      "200":
+        description: "'Producto eliminado correctamente'"
+      "403":
+        description: "Unauthorized"
+      "404":
+        description: "Product not found"
+
+/users:
+  get:
+    tags:
+      - "users"
+    summary: "Retorna lista de todos los usuarios registrados"
+    produces:
+      - "application/json"
+    parameters:
+      - in: "header"
+        name: "Authorization"
+        description: "Se obtiene token luego de realizar el inicio de sesión"
+        required: true
+        type: "string"
+    responses:
+      "200":
+        description: "Operación satisfactoria"
+        schema:
+          type: "array"
+      "401":
+        description: "Unable to connect to the database"
+  post:
+    tags:
+      - "users"
+    summary: "Crea un nuevo usuario"
+    description: ""
+    consumes:
+      - "application/json"
+    produces:
+      - "application/json"
+    parameters:
+      - in: "body"
+        name: "body"
+        description: "Nuevo objeto User para agregar a la lista"
+        required: true
+    responses:
+      "201":
+        description: "Usuario creado correctamente"
+      "400":
+        description: "Bad request"
+
+    /users/login:
+      post:
+        tags:
+          - "users"
+        summary: "Inicio de sesión"
+        description: ""
+        consumes:
+          - "application/json"
+        produces:
+          - "application/json"
+        parameters:
+          - in: "body"
+            name: "body"
+            description: "Objeto usuario"
+            required: true
+        responses:
+          "200":
+            description: "Sesión iniciado + token"
+
+    /users/{userId}:
+      patch:
+        tags:
+          - "users"
+        summary: "Modifica un usuario mediante su id"
+        description: ""
+        consumes:
+          - "application/json"
+        produces:
+          - "application/json"
+        parameters:
+          - in: "header"
+            name: "Authorization"
+            description: "Token con rol de Admin necesario"
+            required: true
+            type: "string"
+          - in: "path"
+            name: "userId"
+            description: "Id de usuario a modificar"
+            required: true
+            type: "string"
+          - in: "body"
+            name: "body"
+            description: "Usuario modificado"
+            required: true
+
+        responses:
+          "200":
+            description: "Usuario modificado correctamente"
+
+      delete:
+        tags:
+          - "users"
+        summary: "Elimina un usuario mediante su Id"
+        description: ""
+        produces:
+          - "application/json"
+        parameters:
+          - in: "header"
+            name: "Authorization"
+            description: "Token de autorización con rol de administrador"
+            required: true
+            type: "string"
+          - in: "path"
+            name: "userId"
+            description: "Id del usuario a eliminar"
+            required: true
+            type: "string"
+        responses:
+          "200":
+            description: "Usuario eliminado correctamente"
+          "403":
+            description: "Unauthorized"
+          "404":
+            description: "Product not found"
+definitions:
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        example: 32
+      username:
+        type: "string"
+        example: "Eze"
+      fullname:
+        type: "string"
+        example: "Freddie Mercury"
+      email:
+        type: "string"
+        example: "freddiemercury@gmail.com"
+      phone:
+        type: "integer"
+        example: "447712345678"
+      address:
+        type: "string"
+        example: "1 Logan PIKensington, London W8 6DE, UK"
+      rolId:
+        type: "integer"
+        example: 1
+  Rol:
+    type: "object"
+    properties:
+      rolId:
+        type: "integer"
+        format: "int64"
+        example: 1
+      name:
+        type: "string"
+        example: "Admin"
+  Product:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        example: 1
+      nombre:
+        type: "string"
+        example: "Admin"
+      precio:
+        type: "string"
+        example: "Admin"
+      status:
+        type: "string"
+        example: "Admin"
+  Paymethod:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        example: 1
+      name:
+        type: "string"
+        example: "Admin"
+  OrderState:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        example: 1
+      state:
+        type: "string"
+        example: "Admin"
+  Order:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        example: 1
+      total:
+        type: "string"
+        example: "Admin"
+  Item:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        example: 1
+      amount:
+        type: "integer"
+        format: "int64"
+        example: "1200"
+      total:
+        type: "string"
+        example: "Admin"

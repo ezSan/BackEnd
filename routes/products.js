@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const sequelize = require("../db/connection");
 const ValidateProductData = require("../middlewares/productControler");
-const {ValidacionJWTadmin} = require("../middlewares/jwtValidation");
+const { ValidacionJWTadmin } = require("../middlewares/jwtValidation");
 const jwt = require("jsonwebtoken");
 
 /* const Producto = require("../models/producto"); */
@@ -13,6 +13,7 @@ router.get("/", (req, res) => {
     sequelize.models.Product.findAll({ where: { status: "ACTIVE" } })
       .then((product) => {
         res.status(200).json(product);
+        console.log("Operación satisfactoria");
       })
       .catch((error) => {
         res.status(400).json(error);
@@ -29,6 +30,7 @@ router.get("/:id", ValidacionJWTadmin, (req, res) => {
   try {
     sequelize.models.Product.findByPk(productId)
       .then((product) => {
+        console.log('Producto encontrado')
         res.status(200).json(product);
       })
       .catch((error) => {
@@ -50,6 +52,7 @@ router.post("/", ValidacionJWTadmin, ValidateProductData, (req, res) => {
     menu
       .save()
       .then((savedMenu) => {
+        console.log('Producto creado correctamente')
         res.status(200).json(savedMenu);
       })
       .catch((error) => {
@@ -76,7 +79,7 @@ router.patch("/:id", ValidacionJWTadmin, (req, res) => {
         product
           .save()
           .then((updatedProduct) => {
-            console.log('Producto actualizado correctamente')
+            console.log("Producto actualizado correctamente");
             res.status(200).json(updatedProduct);
           })
           .catch((error) => {
@@ -104,6 +107,7 @@ router.delete("/:id", ValidacionJWTadmin, (req, res) => {
         product
           .save()
           .then((productDeleted) => {
+            console.log('Producto eliminado correctamente')
             res.status(200).json(productDeleted);
           })
           .catch((error) => {

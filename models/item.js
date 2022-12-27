@@ -28,8 +28,4 @@ Item.init(
   }
 );
 
-/* Item.sync().catch((error)=>{
-  console.error('Error', error);
-}); */
-
 module.exports = Item;
