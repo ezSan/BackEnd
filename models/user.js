@@ -39,7 +39,7 @@ User.init(
     rolId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 1,
+      defaultValue: 2,
     }
   },
   {
@@ -50,23 +50,33 @@ User.init(
   }
 );
 
-/*   User.sync()
-  .then((result) => {
-    User.findOrCreate({
-      where: {
-        username: "admin",
-        fullname: "administrador",
-        email: "admin@admin.com",
-        phone: "123456",
-        address: "Delillah resto",
-        password: "admin",
-        rolId:1
-      }
-    });
+User.sync()
+.then((user)=>{
+  User.findOrCreate({
+    where:{
+      username:'admin',
+      fullname:'Ezequiel Sanchez',
+      email:'ezequiel.sanchez.7391@gmail.com',
+      phone:'2914413671',
+      address:'Huaura 1315',
+      password:'acamica',
+      rolId:'1'
+    }
   })
-  .catch((error) => {
-    console.error("Error", error);
-  });
- */
+  User.findOrCreate({
+    where:{
+      username:'cliente',
+      fullname:'Usuario tipo cliente',
+      email:'cliente@cliente.com',
+      phone:'1223233123',
+      address:'Calle falsa 123',
+      password:'acamica',
+      rolId:'2'
+    }
+  })
+})
+.catch((error)=>{
+  console.error("Error", error)
+})
 
 module.exports = User;

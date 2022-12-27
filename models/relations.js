@@ -4,7 +4,7 @@ const Rol = require("./rol");
 const User = require("./user");
 const Paymethod = require("./paymethod");
 const OrderState = require("./orderState");
-const RequiredProduct = require("./requiredProduct");
+const Item = require("./item");
 
 User.belongsTo(Rol, {
   foreignKey: "rolId",
@@ -22,9 +22,26 @@ Order.belongsTo(OrderState, {
   foreignKey: "orderStateId",
 });
 
-RequiredProduct.belongsTo(Order, {
+Order.hasMany(Item, {
+  foreignKey: 'orderId'
+});
+
+/* RequiredProduct.belongsTo(Order, {
   foreignKey: "orderId",
 });
-RequiredProduct.belongsToMany(Product, { through: "ReqProdJunction" });
+ */
 
-Product.belongsToMany(RequiredProduct, { through: "ReqProdJunction" });
+
+Item.belongsTo(Order, {
+  foreignKey: 'orderId'
+});
+
+Item.belongsTo(Product, {
+  foreignKey: 'productId'
+});
+
+
+
+/* RequiredProduct.belongsToMany(Product, { through: "ReqProdJunction" });
+
+Product.belongsToMany(RequiredProduct, { through: "ReqProdJunction" }); */

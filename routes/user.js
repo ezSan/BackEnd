@@ -4,7 +4,7 @@ const sequelize = require("../db/connection");
 const jwt = require("jsonwebtoken");
 
 const ValidateUserData = require("../middlewares/userControler");
-const ValidacionJWTadmin = require("../middlewares/jwtValidation");
+const {ValidacionJWTadmin} = require("../middlewares/jwtValidation");
 
 router.get("/", (req, res) => {
   try {
@@ -137,6 +137,7 @@ router.post("/login", (req, res) => {
           let authentication = {
             username: user.username,
             rolId: user.rolId,
+            id: user.id,
           };
 
           const token = jwt.sign(authentication, "secret", {

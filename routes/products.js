@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const sequelize = require("../db/connection");
 const ValidateProductData = require("../middlewares/productControler");
-const ValidacionJWTadmin = require("../middlewares/jwtValidation");
+const {ValidacionJWTadmin} = require("../middlewares/jwtValidation");
 const jwt = require("jsonwebtoken");
 
 /* const Producto = require("../models/producto"); */
@@ -32,7 +32,7 @@ router.get("/:id", ValidacionJWTadmin, (req, res) => {
         res.status(200).json(product);
       })
       .catch((error) => {
-        res.status(400).json(product);
+        res.status(400).json(error);
       });
   } catch (error) {
     res.status(400).json(error);
@@ -76,6 +76,7 @@ router.patch("/:id", ValidacionJWTadmin, (req, res) => {
         product
           .save()
           .then((updatedProduct) => {
+            console.log('Producto actualizado correctamente')
             res.status(200).json(updatedProduct);
           })
           .catch((error) => {

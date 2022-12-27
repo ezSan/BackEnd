@@ -11,7 +11,7 @@ Item.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    valor: {
+    amount: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
