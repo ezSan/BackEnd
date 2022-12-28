@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes, Model } = require("sequelize");
+const { Sequelize, DataTypes, Model, INTEGER } = require("sequelize");
 const sequelize = require("../db/connection");
 
 class Order extends Model {}
@@ -14,6 +14,11 @@ Order.init(
     total: {
       type: DataTypes.DECIMAL,
       allowNull: false      
+    },
+    orderStateId: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1     
     }
   },
   {

@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const sequelize = require("../db/connection");
-const { ValidacionJWT } = require("../middlewares/jwtValidation");
+const { ValidacionJWT, ValidacionJWTadmin } = require("../middlewares/jwtValidation");
 
 /* client token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNsaWVudGUiLCJyb2xJZCI6MiwiaWQiOjIsImlhdCI6MTY3MjE3NTI5OCwiZXhwIjoxNjcyMTgyNDk4fQ.4Sz3Ne6uW4WRlDou2WBRB25ESFX0PC-KpSAPmyMgwd4  */
-const sumTotalItems = (previousItem, currentItem) =>  previousItem + currentItem;
-;
+const sumTotalItems = (previousItem, currentItem) => previousItem + currentItem;
 
-router.get("/:id", (req, res) => {
+
+router.get("/:id" , ValidacionJWTadmin, (req, res) => {
   try {
     let orderId = req.params.id;
     sequelize.models.Order.findOne({
@@ -21,6 +21,28 @@ router.get("/:id", (req, res) => {
       })
       .catch((error) => {
         console.error("Error getting final order:", error);
+        res.status(400).json(error);
+      });
+  } catch (error) {
+    console.error("Unable to connect to the database:", error);
+    res.status(400).json(error);
+  }
+});
+
+router.patch("/state/:id" , ValidacionJWTadmin, (req, res) => {
+  try {
+    let orderId = req.params.id;
+    let orderToUpdate = req.body;
+
+    sequelize.models.Order.findByPk(orderId)
+      .then((order) => {
+        order.orderStateId = orderToUpdate.orderStateId;
+        res.status(200).json(order);
+        order.save()
+      })
+      
+      .catch((error) => {
+        console.error("Error actualizando el estado de la orden:", error);
         res.status(400).json(error);
       });
   } catch (error) {
@@ -85,8 +107,8 @@ router.post("/", ValidacionJWT, (req, res) => {
             Promise.all(promisesItem)
               .then((values) => {
                 //Calculate total
-                
-                const total = values.reduce(sumTotalItems);                
+
+                const total = values.reduce(sumTotalItems);
                 orderSaved.set({
                   total: total,
                 });
@@ -133,103 +155,91 @@ router.post("/", ValidacionJWT, (req, res) => {
   }
 });
 
-router.patch("/id", (req, res) => {
-  try {
-    let orderId = req.params.orderId;
-    let orderToUpdate = req.body;
-    console.log(orderId);
-    sequelize.models.Order.findByPk(orderId).then((order) => {
-      order.payMethodId = orderToUpdate.payMethodId;
-      // update order
-      order
-        .save()
-        .then((orderUpdated) => {
-          let itemsToSave = orderToUpdate.items;
-          let promisesItem = [];
-          //product plus others product  result the sum of amounts by price and total
-          itemsToSave.forEach((itemToSave) => {
-            let promiseItem = new Promise((resolve, reject) => {
-              sequelize.models.Product.findByPk(itemToSave.productId)
-                .then((product) => {
-                  sequelize.models.Item.findOrCreate({
-                    where: { orderId: order.id, productId: product.id },
-                    defaults: {
-                      orderId: order.id,
-                      productId: product.id,
-                      amount: itemToSave.amount,
-                    },
-                  })
-                    .then((item) => {
-                      console.log(item, item[0]);
-                      let foundItem = item[0];
-                      foundItem.amount = itemToSave.amount;
-                      foundItem.price = product.price * itemToSave.amount;
-                      foundItem
-                        .save()
-                        .then((updatedItem) => {
-                          let total = itemToSave.amount * product.price;
-                          resolve(total);
-                        })
-                        .catch((error) => {
-                          console.error("Error updating item", error);
-                          reject(error);
+router.patch("/:id", ValidacionJWTadmin , (req, res) => {
+    try {
+        let orderId = req.params.id;
+        let orderToUpdate = req.body;
+        console.log(orderId);
+        sequelize.models.Order.findByPk(orderId).then((order) => {
+           
+            order.paymethodId = orderToUpdate.paymethodId;
+          // update order
+            order.save().then((orderUpdated) => {
+                let itemsToSave = orderToUpdate.items;
+                    let promisesItem = [];
+                    //product plus others product  result the sum of amounts by price and total
+                    itemsToSave.forEach(itemToSave => {
+                        let promiseItem = new Promise((resolve, reject) => {
+                            sequelize.models.Product.findByPk(itemToSave.productId).then((product)=>{
+                                
+                                sequelize.models.Item.findOrCreate({
+                                    where: { orderId: order.id, productId: product.id },
+                                    defaults: {
+                                      orderId: order.id,
+                                      productId: product.id,
+                                      amount: itemToSave.amount
+                                    }
+                                }).then(item=>{                                    
+                                    console.log(item,item[0]);
+                                    let foundItem = item[0];
+                                    foundItem.amount = itemToSave.amount;
+                                    foundItem.price = product.precio * itemToSave.amount;
+                                    foundItem.save().then(updatedItem=>{
+                                        let total = itemToSave.amount*product.precio;
+                                        resolve(total);
+                                    }).catch((error)=>{
+                                        console.error('Error updating item', error);
+                                        reject(error);
+                                    });
+                                }).catch((error)=>{
+                                  console.error('Error finding item', error);
+                                  reject(error);
+                                });
+                                
+                            }).catch((error)=>{
+                                console.error('Error finding product:', error);
+                                reject(error);
+                            });
                         });
-                    })
-                    .catch((error) => {
-                      console.error("Error finding item", error);
-                      reject(error);
+                        promisesItem.push(promiseItem);
                     });
-                })
-                .catch((error) => {
-                  console.error("Error finding product:", error);
-                  reject(error);
-                });
-            });
-            promisesItem.push(promiseItem);
-          });
-          Promise.all(promisesItem)
-            .then((values) => {
-              //Calculate total
-              console.log(values);
-              const total = values.reduce(sumTotalItems);
-              console.log(total);
-              orderUpdated.total = total;
-              orderUpdated
-                .save()
-                .then((orderWithTotal) => {
-                  sequelize.models.Order.findOne({
-                    where: {
-                      id: orderWithTotal.id,
-                    },
-                    include: [{ model: sequelize.models.Item, as: "Items" }],
-                  })
-                    .then((findalOrder) => {
-                      res.status(200).json(findalOrder);
-                    })
-                    .catch((error) => {
-                      console.error("Error getting final order:", error);
-                      res.status(400).json(error);
+                    Promise.all(promisesItem).then(values=>{
+                        //Calculate total
+                        console.log(values);
+                        const total = values.reduce(sumTotalItems);
+                        console.log(total);
+                        orderUpdated.total = total;
+                        orderUpdated.save().then(orderWithTotal=>{
+                            sequelize.models.Order.findOne({
+                                where: {
+                                  id: orderWithTotal.id
+                                },
+                                include: [ { model: sequelize.models.Item, as: 'Items' } ]
+                              }).then(findalOrder=>{
+                                res.status(200).json(findalOrder);
+                              }).catch((error)=>{
+                                console.error('Error getting final order:', error);
+                                res.status(400).json(error);
+                            });
+                        }).catch((error)=>{
+                            console.error('Error saving order with total:', error);
+                            res.status(400).json(error);
+                        });
+                    }).catch((error)=>{
+                        console.error('Unable to connect to the database:', error);
+                        res.status(400).json(error);
                     });
-                })
-                .catch((error) => {
-                  console.error("Error saving order with total:", error);
-                  res.status(400).json(error);
-                });
+            }).catch((error)=>{
+                console.error('Unable to connect to the database:', error);
+                res.status(400).json(error);
             })
-            .catch((error) => {
-              console.error("Unable to connect to the database:", error);
-              res.status(400).json(error);
-            });
-        })
-        .catch((error) => {
-          console.error("Unable to connect to the database:", error);
-          res.status(400).json(error);
         });
-    });
-  } catch (error) {
-    console.error("Unable to connect to the database:", error);
-    res.status(400).json(error);
-  }
-});
+          
+      } catch (error) {
+          console.error('Unable to connect to the database:', error);
+          res.status(400).json(error);
+      }
+})
+;
 
 module.exports = router;
