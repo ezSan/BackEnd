@@ -40,7 +40,7 @@ Desde tu terminal, en visual studio o directamente en la terminal del sistema te
 *$nodemon app.js*
 
 
-###Realizar pruebas en postman :
+### Realizar pruebas en Postman :
 
 Para hacerlo ir a la aplicación de postman e importar el archivo con la colección completa de pruebas
 que tienen relación con el checklist del proyecto.
