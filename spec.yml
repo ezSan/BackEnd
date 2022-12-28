@@ -347,7 +347,7 @@ definitions:
         example: "freddiemercury@gmail.com"
       phone:
         type: "integer"
-        example: "447712345678"
+        example: "29144413671"
       address:
         type: "string"
         example: "1 Logan PIKensington, London W8 6DE, UK"
