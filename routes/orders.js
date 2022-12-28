@@ -3,7 +3,7 @@ const router = express.Router();
 const sequelize = require("../db/connection");
 const { ValidacionJWT, ValidacionJWTadmin } = require("../middlewares/jwtValidation");
 
-/* client token : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNsaWVudGUiLCJyb2xJZCI6MiwiaWQiOjIsImlhdCI6MTY3MjE3NTI5OCwiZXhwIjoxNjcyMTgyNDk4fQ.4Sz3Ne6uW4WRlDou2WBRB25ESFX0PC-KpSAPmyMgwd4  */
+
 const sumTotalItems = (previousItem, currentItem) => previousItem + currentItem;
 
 

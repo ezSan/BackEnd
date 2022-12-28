@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const ValidateUserData = require("../middlewares/userControler");
 const {ValidacionJWTadmin} = require("../middlewares/jwtValidation");
 
-router.get("/", (req, res) => {
+router.get("/", ValidacionJWTadmin, (req, res) => {
   try {
     sequelize.models.User.findAll()
       .then((user) => {
@@ -141,7 +141,7 @@ router.post("/login", (req, res) => {
           };
 
           const token = jwt.sign(authentication, "secret", {
-            expiresIn: "2h",
+            expiresIn: "72h",
           });
 
           res
