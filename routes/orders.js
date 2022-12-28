@@ -17,10 +17,11 @@ router.get("/:id" , ValidacionJWTadmin, (req, res) => {
       include: [{ model: sequelize.models.Item, as: "Items" }],
     })
       .then((findalOrder) => {
+        console.log('Operación satisfactoria')
         res.status(200).json(findalOrder);
       })
       .catch((error) => {
-        console.error("Error getting final order:", error);
+        console.error("Error getting final order", error);
         res.status(400).json(error);
       });
   } catch (error) {
@@ -100,7 +101,6 @@ router.post("/", ValidacionJWT, (req, res) => {
                     reject(error);
                   });
               });
-
               promisesItem.push(promiseItem);
             });
 

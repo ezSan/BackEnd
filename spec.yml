@@ -5,26 +5,25 @@ servers:
 info:
   title: Delilah Resto
   version: 1.0.0
-  description: 
-    "Sistema de pedidos en línea para un restaurante.
+  description: "Sistema de pedidos en línea para un restaurante.
     Esta API REST permite agregar, cancelar, modificar
     y obtener información sobre una base de datos."
   contact:
     email: "ezequiel.sanchez.7391@gmail.com"
   license:
     name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html" 
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
 tags:
-- name: admin
-  description: "Usuario administrador, sin acceso limitado."
-- name: client
-  description: "Usuarios sin permiso de administrador, con acceso limitado."
-- name: /users
-  description: "Endpoint para todas las solicitudes del CRUD de usuarios."
-- name: /products
-  description: "Endpoint para todas las solicitudes del CRUD de productos."
-- name: /orders
-  description: "Endpoint para todas las solicitudes del CRUD de ordenes."
+  - name: admin
+    description: "Usuario administrador, sin acceso limitado."
+  - name: client
+    description: "Usuarios sin permiso de administrador, con acceso limitado."
+  - name: /users
+    description: "Endpoint para todas las solicitudes del CRUD de usuarios."
+  - name: /products
+    description: "Endpoint para todas las solicitudes del CRUD de productos."
+  - name: /orders
+    description: "Endpoint para todas las solicitudes del CRUD de ordenes."
 paths:
 /products:
   get:
@@ -248,6 +247,87 @@ paths:
             description: "Unauthorized"
           "404":
             description: "Product not found"
+/orders:
+  post:
+    tags:
+      - "orders"
+    summary: "Crea una nueva orden"
+    description: ""
+    consumes:
+      - "application/json"
+    produces:
+      - "application/json"
+    parameters:
+      - in: "body"
+        name: "body"
+        description: "Nuevo objeto order para agregar a la lista"
+        required: true
+    responses:
+      "201":
+        description: "Usuario creado correctamente"
+      "400":
+        description: "error adding product to order"
+  get/id:
+    tags:
+      - "order"
+    summary: "Retorna lista las ordenes que coincidan con el ID"
+    produces:
+      - "application/json"
+    parameters:
+      - in: "header"
+        name: "Authorization"
+        description: "Se obtiene token luego de realizar el inicio de sesión"
+        required: true
+        type: "string"
+    responses:
+      "200":
+        description: "Operación satisfactoria"
+        schema:
+          type: "array"
+      "401":
+        description: "Unable to connect to the database"
+
+  /state/id:
+    patch:
+      tags:
+        - "orders"
+      summary: "Modifica el estado de una órden mediante su Id"
+      description: ""
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Objeto order, solo con la propiedad orderStateId"
+          required: true
+      responses:
+        "200":
+          description: "Operación satisfactoria"
+        "401":
+        description: "Unable to connect to the database"
+  /id:
+    patch:
+      tags:
+        - "orders"
+      summary: "Modifica la órden mediante su Id"
+      description: ""
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Objeto order, que reemplazará al seleccionado por iD"
+          required: true
+      responses:
+        "200":
+          description: "Operación satisfactoria"
+        "401":
+        description: "Unable to connect to the database"
+
 definitions:
   User:
     type: "object"
